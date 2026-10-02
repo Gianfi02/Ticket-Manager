@@ -1,0 +1,101 @@
+<a mat-button routerLink="/tickets" class="back">
+  <mat-icon>arrow_back</mat-icon>
+  Torna all'elenco
+</a>
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate" />
+} @else if (notFound()) {
+  <div class="empty-state">
+    <mat-icon>search_off</mat-icon>
+    <h2>Ticket non trovato</h2>
+    <p>Il ticket #{{ id() }} non esiste o è stato eliminato.</p>
+    <a mat-flat-button routerLink="/tickets">Vai all'elenco ticket</a>
+  </div>
+} @else if (loadError()) {
+  <div class="error-box" role="alert">
+    <mat-icon>cloud_off</mat-icon>
+    <span>{{ loadError() }}</span>
+    <button mat-button (click)="load()">Riprova</button>
+  </div>
+} @else if (ticket(); as t) {
+  <mat-card appearance="outlined" [class.closed-card]="t.status === 'CHIUSO'">
+    @if (busy()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+    <mat-card-header>
+      <mat-card-subtitle>Ticket #{{ t.id }}</mat-card-subtitle>
+      <mat-card-title>{{ t.title }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="badges">
+        <app-status-badge [status]="t.status" />
+        <app-priority-badge [priority]="t.priority" />
+      </div>
+
+      @if (t.status === 'CHIUSO') {
+        <div class="info-box">
+          <mat-icon>lock</mat-icon>
+          <span>Ticket chiuso il {{ t.closedAt | date: 'dd/MM/yyyy HH:mm' }}: i dati non sono più modificabili.</span>
+        </div>
+      }
+
+      <h3>Descrizione</h3>
+      <p class="description">{{ t.description }}</p>
+
+      <mat-divider />
+
+      <dl class="details">
+        <div>
+          <dt>Richiedente</dt>
+          <dd>{{ t.requesterName }}</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd><a [href]="'mailto:' + t.requesterEmail">{{ t.requesterEmail }}</a></dd>
+        </div>
+        <div>
+          <dt>Data di creazione</dt>
+          <dd>{{ t.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+        <div>
+          <dt>Ultima modifica</dt>
+          <dd>{{ t.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+        @if (t.closedAt) {
+          <div>
+            <dt>Data di chiusura</dt>
+            <dd>{{ t.closedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+        }
+      </dl>
+    </mat-card-content>
+
+    <mat-card-actions class="actions">
+      @if (t.status === 'APERTO') {
+        <button mat-flat-button (click)="takeCharge(t)" [disabled]="busy()">
+          <mat-icon>assignment_ind</mat-icon>
+          Prendi in carico
+        </button>
+      }
+      @if (t.status === 'IN_CARICO') {
+        <button mat-flat-button (click)="close(t)" [disabled]="busy()">
+          <mat-icon>task_alt</mat-icon>
+          Chiudi ticket
+        </button>
+      }
+      @if (t.status !== 'CHIUSO') {
+        <a mat-stroked-button [routerLink]="['/tickets', t.id, 'edit']" [disabled]="busy()">
+          <mat-icon>edit</mat-icon>
+          Modifica
+        </a>
+      }
+      <span class="spacer"></span>
+      <button mat-button class="danger-text" (click)="remove(t)" [disabled]="busy()">
+        <mat-icon>delete</mat-icon>
+        Elimina
+      </button>
+    </mat-card-actions>
+  </mat-card>
+}

@@ -1,0 +1,107 @@
+.view-toggle {
+  margin-bottom: 16px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  mat-form-field {
+    width: 180px;
+  }
+
+  .search {
+    flex: 1;
+    min-width: 240px;
+  }
+}
+
+.table-wrapper {
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.ticket-row {
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--mat-sys-surface-container-high);
+    outline: none;
+  }
+}
+
+.ticket-id {
+  font-weight: 500;
+  color: var(--mat-sys-primary);
+  white-space: nowrap;
+}
+
+.title-cell {
+  font-weight: 500;
+}
+
+.secondary {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Ticket chiusi: attenuati per distinguerli da quelli ancora da gestire
+.closed {
+  opacity: 0.6;
+
+  .title-cell,
+  .card-title {
+    text-decoration: line-through;
+  }
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ticket-card {
+  cursor: pointer;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.card-title {
+  font: var(--mat-sys-title-medium);
+  margin-bottom: 4px;
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  margin-bottom: 8px;
+}
+
+@media (max-width: 767px) {
+  .filters mat-form-field,
+  .filters .search {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+}

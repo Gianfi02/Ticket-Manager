@@ -1,0 +1,52 @@
+:host {
+  display: block;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.back {
+  margin-bottom: 12px;
+}
+
+mat-card {
+  overflow: hidden;
+}
+
+mat-card-header {
+  margin-bottom: 16px;
+}
+
+mat-form-field {
+  margin-bottom: 8px;
+}
+
+.full {
+  width: 100%;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.priority {
+  width: 200px;
+}
+
+mat-card-actions {
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+
+@media (max-width: 599px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+  .priority {
+    width: 100%;
+  }
+  mat-card-actions > * {
+    flex: 1;
+  }
+}

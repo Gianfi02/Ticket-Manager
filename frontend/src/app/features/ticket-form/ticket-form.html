@@ -1,0 +1,80 @@
+<a mat-button [routerLink]="isEdit() ? ['/tickets', id()] : ['/tickets']" class="back">
+  <mat-icon>arrow_back</mat-icon>
+  Annulla
+</a>
+
+<mat-card appearance="outlined">
+  @if (loading() || saving()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+  <mat-card-header>
+    <mat-card-title>{{ isEdit() ? 'Modifica ticket #' + id() : 'Nuovo ticket' }}</mat-card-title>
+    @if (!isEdit()) {
+      <mat-card-subtitle>Il ticket verrà creato in stato "Aperto"</mat-card-subtitle>
+    }
+  </mat-card-header>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <mat-card-content>
+      @if (error()) {
+        <div class="error-box" role="alert">
+          <mat-icon>error</mat-icon>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Titolo</mat-label>
+        <input matInput formControlName="title" [maxlength]="limits.TITLE_MAX" required />
+        <mat-hint align="end">{{ form.controls.title.value.length }} / {{ limits.TITLE_MAX }}</mat-hint>
+        <mat-error>{{ errorFor('title') }}</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Descrizione della richiesta</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="6"
+          [maxlength]="limits.DESCRIPTION_MAX"
+          required
+        ></textarea>
+        <mat-hint>Minimo {{ limits.DESCRIPTION_MIN }} caratteri</mat-hint>
+        <mat-hint align="end">{{ form.controls.description.value.length }} / {{ limits.DESCRIPTION_MAX }}</mat-hint>
+        <mat-error>{{ errorFor('description') }}</mat-error>
+      </mat-form-field>
+
+      <div class="row">
+        <mat-form-field appearance="outline">
+          <mat-label>Nome del richiedente</mat-label>
+          <input matInput formControlName="requesterName" [maxlength]="limits.NAME_MAX" required />
+          <mat-error>{{ errorFor('requesterName') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email del richiedente</mat-label>
+          <input matInput type="email" formControlName="requesterEmail" required />
+          <mat-error>{{ errorFor('requesterEmail') }}</mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="priority">
+        <mat-label>Priorità</mat-label>
+        <mat-select formControlName="priority" required>
+          @for (p of priorities; track p) {
+            <mat-option [value]="p">{{ priorityLabels[p] }}</mat-option>
+          }
+        </mat-select>
+        <mat-error>{{ errorFor('priority') }}</mat-error>
+      </mat-form-field>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <a mat-button [routerLink]="isEdit() ? ['/tickets', id()] : ['/tickets']">Annulla</a>
+      <button mat-flat-button type="submit" [disabled]="saving() || loading()">
+        <mat-icon>save</mat-icon>
+        {{ isEdit() ? 'Salva modifiche' : 'Crea ticket' }}
+      </button>
+    </mat-card-actions>
+  </form>
+</mat-card>

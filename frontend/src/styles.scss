@@ -1,0 +1,121 @@
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  // Colori di stato e priorità
+  --status-aperto-bg: #dbeafe;
+  --status-aperto-fg: #1e40af;
+  --status-in-carico-bg: #fef3c7;
+  --status-in-carico-fg: #92400e;
+  --status-chiuso-bg: #e5e7eb;
+  --status-chiuso-fg: #374151;
+  --priority-bassa-bg: #dcfce7;
+  --priority-bassa-fg: #166534;
+  --priority-media-bg: #ffedd5;
+  --priority-media-fg: #9a3412;
+  --priority-alta-bg: #fee2e2;
+  --priority-alta-fg: #991b1b;
+  --danger: #b3261e;
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+}
+
+h1 {
+  font: var(--mat-sys-headline-medium);
+  margin: 0;
+}
+
+// Intestazione di pagina con titolo e azione principale
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+// Badge di stato / priorità
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font: var(--mat-sys-label-medium);
+  white-space: nowrap;
+}
+.status-aperto { background: var(--status-aperto-bg); color: var(--status-aperto-fg); }
+.status-in_carico { background: var(--status-in-carico-bg); color: var(--status-in-carico-fg); }
+.status-chiuso { background: var(--status-chiuso-bg); color: var(--status-chiuso-fg); }
+.priority-bassa { background: var(--priority-bassa-bg); color: var(--priority-bassa-fg); }
+.priority-media { background: var(--priority-media-bg); color: var(--priority-media-fg); }
+.priority-alta { background: var(--priority-alta-bg); color: var(--priority-alta-fg); }
+
+// Box messaggi
+.error-box,
+.info-box {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+.error-box {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+.info-box {
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+// Azioni distruttive
+.danger.mat-mdc-unelevated-button:not(:disabled) {
+  background-color: var(--danger);
+  color: #fff;
+}
+.danger-text.mat-mdc-button:not(:disabled) {
+  color: var(--danger);
+}
+
+// Snackbar
+.snack-error {
+  --mat-snack-bar-container-color: var(--mat-sys-error-container);
+  --mat-snack-bar-supporting-text-color: var(--mat-sys-on-error-container);
+  --mat-snack-bar-button-color: var(--mat-sys-on-error-container);
+}
+.snack-success {
+  --mat-snack-bar-container-color: #1b5e20;
+  --mat-snack-bar-supporting-text-color: #fff;
+  --mat-snack-bar-button-color: #c8e6c9;
+}

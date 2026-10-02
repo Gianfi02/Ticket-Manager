@@ -1,0 +1,57 @@
+# Blueprint Render: crea database PostgreSQL, backend (Docker) e frontend (sito statico) dal repository.
+# Le credenziali del database vengono collegate automaticamente al backend.
+# Le variabili indicate con "sync: false" vanno inserite a mano durante la creazione.
+databases:
+  - name: ticketmanager-db
+    plan: free
+    region: frankfurt
+    databaseName: ticketmanager
+    user: ticketmanager
+
+services:
+  - type: web
+    name: ticketmanager-backend
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: frankfurt
+    healthCheckPath: /api/health
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: ticketmanager-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ticketmanager-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ticketmanager-db
+          property: database
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: ticketmanager-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: ticketmanager-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS # URL del frontend, es. https://ticketmanager-frontend.onrender.com
+        sync: false
+
+  - type: web
+    name: ticketmanager-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npx ng build
+    staticPublishPath: dist/frontend/browser
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

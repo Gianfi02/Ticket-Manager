@@ -1,0 +1,158 @@
+<header class="page-header">
+  <h1>Ticket</h1>
+  <a mat-flat-button routerLink="/tickets/new">
+    <mat-icon>add</mat-icon>
+    Nuovo ticket
+  </a>
+</header>
+
+<mat-button-toggle-group
+  class="view-toggle"
+  [value]="view()"
+  (change)="changeView($event.value)"
+  aria-label="Tipo di ticket da visualizzare"
+>
+  <mat-button-toggle value="ACTIVE">Da gestire ({{ activeCount() }})</mat-button-toggle>
+  <mat-button-toggle value="CLOSED">Chiusi ({{ closedCount() }})</mat-button-toggle>
+  <mat-button-toggle value="ALL">Tutti ({{ tickets().length }})</mat-button-toggle>
+</mat-button-toggle-group>
+
+<section class="filters" aria-label="Ricerca e filtri">
+  <mat-form-field appearance="outline" class="search" subscriptSizing="dynamic">
+    <mat-label>Cerca per ID o titolo</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput [(ngModel)]="search" placeholder="es. 12 oppure stampante" />
+    @if (search()) {
+      <button mat-icon-button matSuffix (click)="search.set('')" aria-label="Cancella ricerca">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
+  </mat-form-field>
+
+  @if (availableStatuses().length) {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Stato</mat-label>
+      <mat-select [(ngModel)]="status">
+        <mat-option [value]="null">Tutti</mat-option>
+        @for (s of availableStatuses(); track s) {
+          <mat-option [value]="s">{{ statusLabels[s] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Priorità</mat-label>
+    <mat-select [(ngModel)]="priority">
+      <mat-option [value]="null">Tutte</mat-option>
+      @for (p of priorities; track p) {
+        <mat-option [value]="p">{{ priorityLabels[p] }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  @if (hasFilters()) {
+    <button mat-button (click)="resetFilters()">
+      <mat-icon>filter_alt_off</mat-icon>
+      Azzera filtri
+    </button>
+  }
+</section>
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate" />
+} @else if (loadError()) {
+  <div class="error-box" role="alert">
+    <mat-icon>cloud_off</mat-icon>
+    <span>{{ loadError() }}</span>
+    <button mat-button (click)="load()">Riprova</button>
+  </div>
+} @else if (filtered().length === 0) {
+  <div class="empty-state">
+    <mat-icon>inbox</mat-icon>
+    <p>
+      @if (tickets().length === 0) {
+        Nessun ticket presente. Crea il primo con "Nuovo ticket".
+      } @else {
+        Nessun ticket corrisponde ai criteri selezionati.
+      }
+    </p>
+  </div>
+} @else if (isMobile()) {
+  <!-- Vista mobile: elenco a schede -->
+  <div class="card-list">
+    @for (t of filtered(); track t.id) {
+      <mat-card
+        appearance="outlined"
+        class="ticket-card"
+        [class.closed]="t.status === 'CHIUSO'"
+        (click)="open(t)"
+        (keydown.enter)="open(t)"
+        tabindex="0"
+        role="link"
+      >
+        <mat-card-content>
+          <div class="card-top">
+            <span class="ticket-id">#{{ t.id }}</span>
+            <app-status-badge [status]="t.status" />
+          </div>
+          <div class="card-title">{{ t.title }}</div>
+          <div class="card-meta">
+            <span>{{ t.requesterName }}</span>
+            <span>{{ t.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <app-priority-badge [priority]="t.priority" />
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+} @else {
+  <!-- Vista desktop: tabella -->
+  <div class="table-wrapper mat-elevation-z0">
+    <table mat-table [dataSource]="filtered()">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let t" class="ticket-id">#{{ t.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Titolo</th>
+        <td mat-cell *matCellDef="let t" class="title-cell">{{ t.title }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="requester">
+        <th mat-header-cell *matHeaderCellDef>Richiedente</th>
+        <td mat-cell *matCellDef="let t">
+          <div>{{ t.requesterName }}</div>
+          <div class="secondary">{{ t.requesterEmail }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef>Creato il</th>
+        <td mat-cell *matCellDef="let t">{{ t.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="priority">
+        <th mat-header-cell *matHeaderCellDef>Priorità</th>
+        <td mat-cell *matCellDef="let t"><app-priority-badge [priority]="t.priority" /></td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Stato</th>
+        <td mat-cell *matCellDef="let t"><app-status-badge [status]="t.status" /></td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let t; columns: columns"
+        class="ticket-row"
+        [class.closed]="t.status === 'CHIUSO'"
+        (click)="open(t)"
+        (keydown.enter)="open(t)"
+        tabindex="0"
+      ></tr>
+    </table>
+  </div>
+}
